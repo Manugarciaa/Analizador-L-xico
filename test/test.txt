@@ -1,13 +1,5 @@
 programa ejemplo() {
-    int a, b, c;
-    a = 5 + 3;
-    si (a > 7) {
-        leer b;
-    } sino {
-        imprimir("El valor es menor o igual");
-        mientras (a < 10) {
-            a = a + 1;
-        }
-    }
+    # HOLA
+    int 1a, b@; 
     terminar;
 }
