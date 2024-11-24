@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from lex import tokens
+from lex import tokens, analizador
 from graphviz import Digraph
 
 # Función para graficar el árbol sintáctico
@@ -29,7 +29,6 @@ def graficar_arbol(nodo, dot=None, parent=None):
 
     return dot
 
-
 class Nodo:
     def __init__(self, nombre, valor=None):
         self.nombre = nombre
@@ -39,8 +38,8 @@ class Nodo:
     def agregar_hijo(self, hijo):
         if isinstance(hijo, Nodo):
             self.hijos.append(hijo)
-        else:
-            raise ValueError("El hijo debe ser una instancia de Nodo.")
+        # else:
+        #     print(f"Advertencia: Intento de agregar un hijo no válido al nodo '{self.nombre}'.")
 
     def imprimir(self, nivel=0):
         indentacion = "  " * nivel
@@ -61,11 +60,15 @@ precedence = (
 # Regla para <Programa>
 def p_programa(p):
     '''Programa : PROGRAMA IDENTIFICADOR PARENTESIS_IZQ PARENTESIS_DER LLAVE_IZQ Sentencias Terminar LLAVE_DER'''
-    print(f"Programa '{p[2]}' procesado correctamente.")
+    print(f"Línea {p.lineno(8)}: Programa '{p[2]}' procesado correctamente.")
     nodo = Nodo("Programa", p[2])  
     nodo.agregar_hijo(p[6])
     nodo.agregar_hijo(p[7])
     p[0] = nodo
+
+def p_sentencias_vacia(p):
+    '''Sentencias : '''
+    p[0] = Nodo("Sentencias")  # Nodo vacío para representar la ausencia de sentencias
 
 # Regla para <Sentencias>
 def p_sentencias_unica(p):
@@ -74,12 +77,12 @@ def p_sentencias_unica(p):
     nodo.agregar_hijo(p[1])
     p[0] = nodo
 
+# Regla para <Sentencias>
 def p_sentencias_multiples(p):
     '''Sentencias : Sentencias Sentencia'''
     p[1].agregar_hijo(p[2])
     p[0] = p[1]
 
-# Regla para <Sentencia>
 def p_sentencia_declaracion(p):
     '''Sentencia : Declaracion'''
     p[0] = p[1]
@@ -107,7 +110,7 @@ def p_sentencia_si(p):
 # Regla para <Leer>
 def p_leer(p):
     '''Leer : LEER IDENTIFICADOR PUNTO_Y_COMA'''
-    print(f"Leer: variable '{p[2]}'")
+    print(f"Línea {p.lineno(2)}: Leer variable '{p[2]}'")
     nodo = Nodo("Leer")
     nodo.agregar_hijo(Nodo("Variable", p[2]))
     p[0] = nodo
@@ -115,11 +118,15 @@ def p_leer(p):
 # Regla para <Imprimir>
 def p_imprimir(p):
     '''Imprimir : IMPRIMIR PARENTESIS_IZQ ContenidoImprimir PARENTESIS_DER PUNTO_Y_COMA'''
-    print(f"Imprimir: {p[3]}")
+    print(f"Línea {p.lineno(1)}: Imprimir con contenido: {p[3]}")
     nodo = Nodo("Imprimir")
     for item in p[3]:
         nodo.agregar_hijo(Nodo("Contenido", item))
     p[0] = nodo
+
+def p_imprimir_error_argumentos(p):
+    '''Imprimir : IMPRIMIR PARENTESIS_IZQ error PARENTESIS_DER PUNTO_Y_COMA'''
+    print(f"Error de sintaxis: Argumentos no válidos en 'imprimir' en línea {p.lineno(3)}. Verifica el contenido.")
 
 # Regla para <ContenidoImprimir>
 def p_contenido_imprimir_texto(p):
@@ -137,7 +144,7 @@ def p_contenido_imprimir_multiples(p):
 # Regla para <Declaracion>
 def p_declaracion_simple(p):
     '''Declaracion : Tipo ListaIdentificadores PUNTO_Y_COMA'''
-    print(f"Declaración de variables ({p[1].valor}): {', '.join(p[2])}")
+    print(f"Línea {p.lineno(3)}: Declaración de variables '{p[1].valor}': {', '.join(p[2])}")
     nodo = Nodo("Declaracion", p[1].valor)
     for identificador in p[2]:
         nodo.agregar_hijo(Nodo("Variable", identificador))
@@ -145,11 +152,15 @@ def p_declaracion_simple(p):
 
 def p_declaracion_asignacion(p):
     '''Declaracion : Tipo IDENTIFICADOR IGUAL Expresion PUNTO_Y_COMA'''
-    print(f"Declaración con asignación ({p[1].valor}): {p[2]} = {p[4].valor}")
+    print(f"Línea {p.lineno(2)}: Declaración con asignación ({p[1].valor}): {p[2]} = {p[4].valor}")
     nodo = Nodo("Declaracion y Asignacion", p[1].valor)
     nodo.agregar_hijo(Nodo("Variable", p[2]))
     nodo.agregar_hijo(p[4])
     p[0] = nodo
+
+def p_declaracion_error_identificador(p):
+    '''Declaracion : Tipo error PUNTO_Y_COMA'''
+    print(f"Error de sintaxis: Identificadores no válidos en declaración en línea {p.lineno(2)}.")
 
 # Regla para <Tipo>
 def p_tipo(p):
@@ -175,20 +186,28 @@ def p_asignacion(p):
     nodo.agregar_hijo(p[3])
     p[0] = nodo
 
+def p_asignacion_error_identificador(p):
+    '''Asignacion : error IGUAL Expresion PUNTO_Y_COMA'''
+    print(f"Error de sintaxis: Identificador no válido en línea {p.lineno(1)}.")
+
+def p_asignacion_error_faltante(p):
+    '''Asignacion : IDENTIFICADOR IGUAL error PUNTO_Y_COMA'''
+    print(f"Error de sintaxis: Valor faltante en asignación en línea {p.lineno(2)}.")
+
 # Regla para <Expresion>
 def p_expresion_numero(p):
     '''Expresion : NUMERO'''
-    print(f"Expresión detectada: {p[1]}")
+    # print(f"Expresión detectada: {p[1]}")
     p[0] = Nodo("Numero", p[1])
 
 def p_expresion_identificador(p):
     '''Expresion : IDENTIFICADOR'''
-    print(f"Expresión detectada: Variable {p[1]}")
+    # print(f"Expresión detectada: Variable {p[1]}")
     p[0] = Nodo("Variable", p[1])
 
 def p_expresion_suma(p):
     '''Expresion : Expresion SUMA Expresion'''
-    print(f"Expresión detectada: {p[1].valor} + {p[3].valor}")
+    # print(f"Expresión detectada: {p[1].valor} + {p[3].valor}")
     nodo = Nodo("Suma")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
@@ -196,7 +215,7 @@ def p_expresion_suma(p):
 
 def p_expresion_resta(p):
     '''Expresion : Expresion RESTA Expresion'''
-    print(f"Expresión detectada: {p[1].valor} - {p[3].valor}")
+    # print(f"Expresión detectada: {p[1].valor} - {p[3].valor}")
     nodo = Nodo("Resta")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
@@ -204,7 +223,7 @@ def p_expresion_resta(p):
 
 def p_expresion_multiplicacion(p):
     '''Expresion : Expresion MULTIPLICACION Expresion'''
-    print(f"Expresión detectada: {p[1].valor} * {p[3].valor}")
+    # print(f"Expresión detectada: {p[1].valor} * {p[3].valor}")
     nodo = Nodo("Multiplicacion")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
@@ -212,38 +231,55 @@ def p_expresion_multiplicacion(p):
 
 def p_expresion_division(p):
     '''Expresion : Expresion DIVISION Expresion'''
-    print(f"Expresión detectada: {p[1].valor} / {p[3].valor}")
+    # print(f"Expresión detectada: {p[1].valor} / {p[3].valor}")
     nodo = Nodo("Division")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
     p[0] = nodo
 
+def p_expresion_error_operador(p):
+    '''Expresion : error SUMA Expresion
+                 | Expresion SUMA error'''
+    print(f"Error de sintaxis: Operador '+' mal usado en línea {p.lineno(2)}. Falta un operando.")
+
 # Regla para <Mientras>
 def p_mientras(p):
     '''Mientras : MIENTRAS PARENTESIS_IZQ Condicion PARENTESIS_DER LLAVE_IZQ Sentencias LLAVE_DER'''
-    print(f"Bloque mientras procesado con condición: {p[3].valor}")
+    print(f"Líneas {p.lineno(1)}-{p.lineno(7)}: Bloque 'mientras' procesado con condición: {p[3].valor}")
     nodo = Nodo("Mientras")
     nodo.agregar_hijo(p[3])
     nodo.agregar_hijo(p[6])
     p[0] = nodo
 
+def p_mientras_error(p):
+    '''Mientras : MIENTRAS PARENTESIS_IZQ error PARENTESIS_DER LLAVE_IZQ Sentencias LLAVE_DER'''
+    print(f"Error de sintaxis en la condición del bloque 'mientras' en línea {p.lineno(3)}.")
+
 # Regla para <Si>
 def p_si(p):
     '''Si : SI PARENTESIS_IZQ Condicion PARENTESIS_DER LLAVE_IZQ Sentencias LLAVE_DER'''
-    print(f"Estructura si procesada con condición: {p[3].valor}")
+    print(f"Líneas {p.lineno(1)}-{p.lineno(7)}: Estructura 'si' procesada con condición: {p[3].valor}")
     nodo = Nodo("Si")
     nodo.agregar_hijo(p[3])
     nodo.agregar_hijo(p[6])
     p[0] = nodo
 
+def p_si_error_incompleto(p):
+    '''Si : SI PARENTESIS_IZQ error PARENTESIS_DER LLAVE_IZQ Sentencias LLAVE_DER'''
+    print(f"Error de sintaxis: Condición mal formada en 'si' en línea {p.lineno(3)}. Verifica la condición.")
+
 def p_si_sino(p):
     '''Si : SI PARENTESIS_IZQ Condicion PARENTESIS_DER LLAVE_IZQ Sentencias LLAVE_DER SINO LLAVE_IZQ Sentencias LLAVE_DER'''
-    print(f"Estructura si-sino procesada con condición: {p[3].valor}")
+    print(f"Líneas {p.lineno(1)}-{p.lineno(11)}: Estructura 'si-sino' procesada con condición: {p[3].valor}")
     nodo = Nodo("Si-Sino")
     nodo.agregar_hijo(p[3])
     nodo.agregar_hijo(p[6])
     nodo.agregar_hijo(p[10])
     p[0] = nodo
+
+def p_si_sino_error(p):
+    '''Si : SINO LLAVE_IZQ Sentencias LLAVE_DER'''
+    print(f"Error de sintaxis: 'sino' no puede existir sin un bloque 'si' en línea {p.lineno(1)}.")
 
 # Regla para <Condicion>
 def p_condicion_comparacion(p):
@@ -253,9 +289,10 @@ def p_condicion_comparacion(p):
                  | Expresion MAYOR_IGUAL Expresion
                  | Expresion IGUAL_IGUAL Expresion
                  | Expresion DISTINTO Expresion'''
-    nodo = Nodo("Condicion", p[2])
-    nodo.agregar_hijo(p[1])
-    nodo.agregar_hijo(p[3])
+    descripcion = f"{p[1].valor} {p[2]} {p[3].valor}"  # Construye una descripción completa
+    nodo = Nodo("Condicion", descripcion)  # Usa esta descripción en el nodo
+    nodo.agregar_hijo(p[1])  # Agrega el primer operando
+    nodo.agregar_hijo(p[3])  # Agrega el segundo operando
     p[0] = nodo
 
 def p_condicion_logica(p):
@@ -268,15 +305,33 @@ def p_condicion_logica(p):
     nodo.agregar_hijo(p[3])
     p[0] = nodo
 
+def p_condicion_error_operador(p):
+    '''Condicion : Expresion MENOR error
+                 | error MENOR Expresion'''
+    print(f"Error de sintaxis: Operador '<' mal usado en línea {p.lineno(2)}. Verifica los operandos.")
+
 # Regla para <Terminar>
 def p_terminar(p):
     '''Terminar : TERMINAR PUNTO_Y_COMA'''
-    p[0] = Nodo("Terminar")
+    columna = calcular_columna(p.slice[1], analizador)
+    print(f"Línea {p.lineno(1)}: Instrucción 'terminar'")
+    nodo = Nodo("Terminar")
+    p[0] = nodo
+
+def calcular_columna(p, lexer):
+    line_start = lexer.lexdata.rfind('\n', 0, p.lexpos) + 1
+    return (p.lexpos - line_start) + 1
 
 # Manejo de errores
 def p_error(p):
     if p:
-        print(f"Error de sintaxis en token: {p.type} ('{p.value}') en línea {p.lineno}.")
+        column = calcular_columna(p, analizador)
+        if p.type == 'LLAVE_DER':
+            print(f"Error de sintaxis: Llave de cierre inesperada en línea {p.lineno}, columna {column}.")
+        elif p.type == 'LLAVE_IZQ':
+            print(f"Error de sintaxis: Falta llave de cierre '}}' para el bloque iniciado en línea {p.lineno}, columna {column}.")
+        else:
+            print(f"Error de sintaxis en token: {p.type} ('{p.value}') en línea {p.lineno}, columna {column}.")
     else:
         print("Error de sintaxis: fin inesperado del archivo.")
 

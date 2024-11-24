@@ -1,5 +1,6 @@
-programa ejemplo() {
-    # HOLA
-    int 1a, b@; 
+programa test() {
+    mientras (x <= 10) {
+        imprimir(x);
+    }
     terminar;
 }

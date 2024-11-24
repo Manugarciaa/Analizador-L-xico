@@ -16,7 +16,9 @@ def main():
 
         # Análisis Sintáctico
         print("\n=== Análisis Sintáctico ===")
-        arbol = parser.parse(cadena)
+        analizador.lineno = 1  # Reinicia el número de línea
+        analizador.line_start = 0  # Reinicia el inicio de la línea
+        arbol = parser.parse(cadena, lexer=analizador)
         if arbol:
             print("\n=== Árbol Sintáctico ===")
             arbol.imprimir()
