@@ -6,12 +6,11 @@ from lex import analizador, analizar
 from sin import parser, graficar_arbol
 from PIL import Image, ImageTk
 
-
 class CompilerGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Analizador de Lenguajes")
-        self.root.geometry("1600x800")
+        self.root.geometry("1700x800")
 
         # Frame principal con bordes
         main_frame = ttk.Frame(root, padding="5")
@@ -37,9 +36,9 @@ class CompilerGUI:
         right_frame.grid(row=0, column=2, sticky="nsew")
 
         # Ajustar pesos de las columnas para distribuir espacio
-        top_frame.grid_columnconfigure(0, weight=3)
-        top_frame.grid_columnconfigure(1, weight=3)
-        top_frame.grid_columnconfigure(2, weight=6)
+        top_frame.grid_columnconfigure(0, weight=1)
+        top_frame.grid_columnconfigure(1, weight=4)
+        top_frame.grid_columnconfigure(2, weight=5)
         top_frame.grid_rowconfigure(0, weight=1)
 
         # Prevenir propagación automática
@@ -49,13 +48,13 @@ class CompilerGUI:
 
         # Área de texto para código con fondo blanco
         self.code_text = scrolledtext.ScrolledText(left_frame, wrap=tk.WORD,
-                                                   width=50, bg="white", fg="black",
+                                                   width=40, bg="white", fg="black",
                                                    font=("Consolas", 11))
         self.code_text.pack(fill=tk.BOTH, expand=True)
 
         # Área de texto para resultados con fondo blanco
         self.output_text = scrolledtext.ScrolledText(center_frame, wrap=tk.WORD,
-                                                     width=50, bg="white", fg="black",
+                                                     width=60, bg="white", fg="black",
                                                      font=("Consolas", 11))
         self.output_text.pack(fill=tk.BOTH, expand=True)
 
@@ -92,9 +91,6 @@ class CompilerGUI:
         # Redireccionar stdout
         self.stdout_redirector = io.StringIO()
         self.original_stdout = sys.stdout
-
-    # Métodos adicionales como create_button, adjust_color, load_file, etc., permanecen igual
-
 
     def create_button(self, parent, text, command, bg_color, fg_color):
         """Crear botón con estilo personalizado"""
