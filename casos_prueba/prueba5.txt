@@ -1,0 +1,7 @@
+programa prueba5() {
+    int x;
+    mientras (x <) {
+        imprimir("Esto está mal");
+    }
+    terminar;
+}

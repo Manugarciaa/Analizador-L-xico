@@ -181,14 +181,31 @@ def analizar(texto):
     analizador.lineno = 1  
     analizador.line_start = 0  
     analizador.input(texto)
-    print("TOKEN            VALOR           LÍNEA            COLUMNA")
-    print("-" * 60)
-    while True:
-        tok = analizador.token()
-        if not tok:
-            break
-        tipo = tok.type.ljust(15)
-        valor = str(tok.value).ljust(15)
-        linea = str(tok.lineno).ljust(4)
-        columna = str(calcular_columna(tok, analizador)).ljust(4)
-        print(f"Token: {tipo} Valor: {valor} Línea: {linea} Columna: {columna}")
+
+    # Ruta del archivo de salida
+    ruta_archivo = "archivos_salida/tabla_simbolos.txt"
+
+    # Abrir el archivo en modo escritura
+    with open(ruta_archivo, "w", encoding="utf-8") as archivo:
+        # Encabezado para la tabla de símbolos
+        encabezado = "TOKEN            VALOR           LÍNEA            COLUMNA\n" + "-" * 60 + "\n"
+        print(encabezado, end="")
+        archivo.write(encabezado)
+
+        # Analizar y guardar tokens
+        while True:
+            tok = analizador.token()
+            if not tok:
+                break
+
+            tipo = tok.type.ljust(15)
+            valor = str(tok.value).ljust(15)
+            linea = str(tok.lineno).ljust(4)
+            columna = str(calcular_columna(tok, analizador)).ljust(4)
+            linea_salida = f"Token: {tipo} Valor: {valor} Línea: {linea} Columna: {columna}\n"
+
+            # Imprimir en la consola
+            print(linea_salida, end="")
+
+            # Guardar en el archivo
+            archivo.write(linea_salida)

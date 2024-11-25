@@ -1,0 +1,2 @@
+=== Lista de errores encontrados ===
+Error de sintaxis: Operador mal usado en línea 3. Verifica los operandos.

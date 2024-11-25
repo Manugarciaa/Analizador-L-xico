@@ -1,0 +1,9 @@
+programa prueba2() {
+    int x;
+    x = 1;
+    mientras (x < 5) {
+        imprimir("Valor de x:", x);
+        x = x + 1;
+    }
+    terminar;
+}

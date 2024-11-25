@@ -1,0 +1,5 @@
+programa prueba4() {
+    int a;
+    a = 10;
+    terminar
+}

@@ -3,7 +3,7 @@ from tkinter import ttk, scrolledtext, filedialog, messagebox
 import sys
 import io
 from lex import analizador, analizar
-from sin import parser, graficar_arbol
+from sin import parser, parser_state, errores_sintacticos, reiniciar_parser, guardar_errores_en_archivo, graficar_arbol
 from PIL import Image, ImageTk
 
 class CompilerGUI:
@@ -80,8 +80,8 @@ class CompilerGUI:
         button_styles = [
             ("Cargar Archivo", self.load_file, "#007acc", "white"),
             ("Análisis Léxico", self.analisis_lexico, "#28a745", "white"),
-            ("Análisis Sintáctico", self.analisis_sintactico, "#ffa500", "white"),
-            ("Generar Árbol", self.generar_arbol, "#dc3545", "white")
+            ("Análisis Sintáctico", self.analisis_sintactico, "#ffa500", "white")
+           # ("Generar Árbol", self.generar_arbol, "#dc3545", "white")
         ]
 
         # Crear botones con los estilos definidos
@@ -92,8 +92,10 @@ class CompilerGUI:
         self.stdout_redirector = io.StringIO()
         self.original_stdout = sys.stdout
 
+        self.generate_tree_button = self.create_button(buttons_frame, "Generar Árbol", self.generar_arbol, "#dc3545", "white")
+
+
     def create_button(self, parent, text, command, bg_color, fg_color):
-        """Crear botón con estilo personalizado"""
         btn = tk.Button(
             parent,
             text=text,
@@ -116,6 +118,7 @@ class CompilerGUI:
             bg=bg_color))
 
         return btn
+
 
     def adjust_color(self, color, amount):
         """Ajustar el color para efectos hover"""
@@ -170,15 +173,35 @@ class CompilerGUI:
 
     def analisis_sintactico(self):
         try:
+            # Limpiar el estado del parser
+            reiniciar_parser()
+            errores_sintacticos.clear()  # Limpiar la lista de errores
+            parser_state.clear_error()  # Reiniciar el estado del parser
+            parser.error = False  # Reiniciar indicador de errores en el parser
+
+            # Obtener el código de entrada
             codigo = self.code_text.get(1.0, tk.END)
             self.redirect_stdout()
+
+            # Reiniciar el lexer
             analizador.lineno = 1
             analizador.line_start = 0
+
+            # Ejecutar el análisis sintáctico
             arbol = parser.parse(codigo, lexer=analizador)
-            if arbol:
-                pass
+
+            # Verificar el resultado del análisis
+            if parser.error or parser_state.error_found:
+                print("\nErrores detectados durante el análisis sintáctico. No se puede construir el árbol.")
+                self.generate_tree_button.config(state=tk.DISABLED)  # Deshabilitar el botón
+                guardar_errores_en_archivo()  # Guardar los errores detectados en un archivo
+            elif arbol:
+                print("\nEl análisis sintáctico finalizó correctamente.")
+                self.generate_tree_button.config(state=tk.NORMAL)  # Habilitar el botón
             else:
-                print("No se pudo construir el árbol sintáctico.")
+                print("\nNo se puede construir el árbol sintáctico.")
+                self.generate_tree_button.config(state=tk.DISABLED)
+
             self.restore_stdout()
         except Exception as e:
             self.restore_stdout()
@@ -194,7 +217,7 @@ class CompilerGUI:
             arbol = parser.parse(codigo, lexer=analizador)
             if arbol:
                 dot = graficar_arbol(arbol)
-                dot_path = 'arbol_sintactico.dot'
+                dot_path = 'archivos_salida/arbol_sintactico.dot'
                 output_path = dot.render(dot_path, format='png', cleanup=False)
 
                 with open(dot_path, 'r', encoding='utf-8') as file:

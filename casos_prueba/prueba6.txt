@@ -1,0 +1,9 @@
+programa prueba6() {
+    int a, b;
+    a = ;
+    b = 20;
+    sino {
+        imprimir("a no es menor que b");
+    }
+    terminar;
+}

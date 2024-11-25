@@ -1,0 +1,11 @@
+programa prueba3() {
+    int a, b;
+    a = 10;
+    b = 20;
+    si (a < b) {
+        imprimir("a es menor que b");
+    } sino {
+        imprimir("a no es menor que b");
+    }
+    terminar;
+}

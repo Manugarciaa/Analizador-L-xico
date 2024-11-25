@@ -1,0 +1,7 @@
+programa prueba1() {
+    int a, b, c;
+    a = 10;
+    b = a + 5;
+    c = b * 2;
+    terminar;
+}

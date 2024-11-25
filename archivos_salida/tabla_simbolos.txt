@@ -1,0 +1,33 @@
+TOKEN            VALOR           LÍNEA            COLUMNA
+------------------------------------------------------------
+Token: PROGRAMA        Valor: programa        Línea: 1    Columna: 1   
+Token: IDENTIFICADOR   Valor: prueba1         Línea: 1    Columna: 10  
+Token: PARENTESIS_IZQ  Valor: (               Línea: 1    Columna: 17  
+Token: PARENTESIS_DER  Valor: )               Línea: 1    Columna: 18  
+Token: LLAVE_IZQ       Valor: {               Línea: 1    Columna: 20  
+Token: INT             Valor: int             Línea: 2    Columna: 5   
+Token: IDENTIFICADOR   Valor: a               Línea: 2    Columna: 9   
+Token: COMA            Valor: ,               Línea: 2    Columna: 10  
+Token: IDENTIFICADOR   Valor: b               Línea: 2    Columna: 12  
+Token: COMA            Valor: ,               Línea: 2    Columna: 13  
+Token: IDENTIFICADOR   Valor: c               Línea: 2    Columna: 15  
+Token: PUNTO_Y_COMA    Valor: ;               Línea: 2    Columna: 16  
+Token: IDENTIFICADOR   Valor: a               Línea: 3    Columna: 5   
+Token: IGUAL           Valor: =               Línea: 3    Columna: 7   
+Token: NUMERO          Valor: 10              Línea: 3    Columna: 9   
+Token: PUNTO_Y_COMA    Valor: ;               Línea: 3    Columna: 11  
+Token: IDENTIFICADOR   Valor: b               Línea: 4    Columna: 5   
+Token: IGUAL           Valor: =               Línea: 4    Columna: 7   
+Token: IDENTIFICADOR   Valor: a               Línea: 4    Columna: 9   
+Token: SUMA            Valor: +               Línea: 4    Columna: 11  
+Token: NUMERO          Valor: 5               Línea: 4    Columna: 13  
+Token: PUNTO_Y_COMA    Valor: ;               Línea: 4    Columna: 14  
+Token: IDENTIFICADOR   Valor: c               Línea: 5    Columna: 5   
+Token: IGUAL           Valor: =               Línea: 5    Columna: 7   
+Token: IDENTIFICADOR   Valor: b               Línea: 5    Columna: 9   
+Token: MULTIPLICACION  Valor: *               Línea: 5    Columna: 11  
+Token: NUMERO          Valor: 2               Línea: 5    Columna: 13  
+Token: PUNTO_Y_COMA    Valor: ;               Línea: 5    Columna: 14  
+Token: TERMINAR        Valor: terminar        Línea: 6    Columna: 5   
+Token: PUNTO_Y_COMA    Valor: ;               Línea: 6    Columna: 13  
+Token: LLAVE_DER       Valor: }               Línea: 7    Columna: 1   
