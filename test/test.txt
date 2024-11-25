@@ -1,6 +1,4 @@
 programa test() {
-    mientras (x <= 10) {
-        imprimir(x);
-    }
+    int a;
     terminar;
 }

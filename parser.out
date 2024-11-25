@@ -3,6 +3,7 @@ Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 Unused terminals:
 
     CARACTER
+    ERROR
     FLOTANTE
 
 Grammar
@@ -72,6 +73,7 @@ CHAR                 : 22
 COMA                 : 16 24
 DISTINTO             : 47
 DIVISION             : 33
+ERROR                : 
 FLOAT                : 21
 FLOTANTE             : 
 IDENTIFICADOR        : 1 11 15 18 23 24 25 27 29

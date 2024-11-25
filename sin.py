@@ -4,16 +4,9 @@ from graphviz import Digraph
 
 # Función para graficar el árbol sintáctico
 def graficar_arbol(nodo, dot=None, parent=None):
-    """
-    Graficar el árbol sintáctico usando Graphviz.
-    :param nodo: Nodo raíz del árbol a graficar.
-    :param dot: Objeto Graphviz Digraph.
-    :param parent: Nodo padre en el grafo.
-    :return: Objeto Digraph con el árbol generado.
-    """
     if dot is None:
         dot = Digraph(format='png')
-        dot.attr(dpi='300')  # Opcional: Mejora la resolución
+        dot.attr(dpi='300')
 
     # Crear un nodo en el grafo para este Nodo
     etiqueta = f"{nodo.nombre}" + (f": {nodo.valor}" if nodo.valor else "")
@@ -38,8 +31,6 @@ class Nodo:
     def agregar_hijo(self, hijo):
         if isinstance(hijo, Nodo):
             self.hijos.append(hijo)
-        # else:
-        #     print(f"Advertencia: Intento de agregar un hijo no válido al nodo '{self.nombre}'.")
 
     def imprimir(self, nivel=0):
         indentacion = "  " * nivel
@@ -68,7 +59,7 @@ def p_programa(p):
 
 def p_sentencias_vacia(p):
     '''Sentencias : '''
-    p[0] = Nodo("Sentencias")  # Nodo vacío para representar la ausencia de sentencias
+    p[0] = Nodo("Sentencias")  
 
 # Regla para <Sentencias>
 def p_sentencias_unica(p):
@@ -197,17 +188,14 @@ def p_asignacion_error_faltante(p):
 # Regla para <Expresion>
 def p_expresion_numero(p):
     '''Expresion : NUMERO'''
-    # print(f"Expresión detectada: {p[1]}")
     p[0] = Nodo("Numero", p[1])
 
 def p_expresion_identificador(p):
     '''Expresion : IDENTIFICADOR'''
-    # print(f"Expresión detectada: Variable {p[1]}")
     p[0] = Nodo("Variable", p[1])
 
 def p_expresion_suma(p):
     '''Expresion : Expresion SUMA Expresion'''
-    # print(f"Expresión detectada: {p[1].valor} + {p[3].valor}")
     nodo = Nodo("Suma")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
@@ -215,7 +203,6 @@ def p_expresion_suma(p):
 
 def p_expresion_resta(p):
     '''Expresion : Expresion RESTA Expresion'''
-    # print(f"Expresión detectada: {p[1].valor} - {p[3].valor}")
     nodo = Nodo("Resta")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
@@ -223,7 +210,6 @@ def p_expresion_resta(p):
 
 def p_expresion_multiplicacion(p):
     '''Expresion : Expresion MULTIPLICACION Expresion'''
-    # print(f"Expresión detectada: {p[1].valor} * {p[3].valor}")
     nodo = Nodo("Multiplicacion")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
@@ -231,7 +217,6 @@ def p_expresion_multiplicacion(p):
 
 def p_expresion_division(p):
     '''Expresion : Expresion DIVISION Expresion'''
-    # print(f"Expresión detectada: {p[1].valor} / {p[3].valor}")
     nodo = Nodo("Division")
     nodo.agregar_hijo(p[1])
     nodo.agregar_hijo(p[3])
@@ -289,10 +274,10 @@ def p_condicion_comparacion(p):
                  | Expresion MAYOR_IGUAL Expresion
                  | Expresion IGUAL_IGUAL Expresion
                  | Expresion DISTINTO Expresion'''
-    descripcion = f"{p[1].valor} {p[2]} {p[3].valor}"  # Construye una descripción completa
-    nodo = Nodo("Condicion", descripcion)  # Usa esta descripción en el nodo
-    nodo.agregar_hijo(p[1])  # Agrega el primer operando
-    nodo.agregar_hijo(p[3])  # Agrega el segundo operando
+    descripcion = f"{p[1].valor} {p[2]} {p[3].valor}" 
+    nodo = Nodo("Condicion", descripcion)
+    nodo.agregar_hijo(p[1])  
+    nodo.agregar_hijo(p[3])  
     p[0] = nodo
 
 def p_condicion_logica(p):
